@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_training/pages/products.dart';
 import 'package:flutter_training/pages/product_edit.dart';
 import 'package:flutter_training/pages/product_list.dart';
-import 'package:flutter_training/models/product.dart';
 
 class ProductsAdminPage extends StatelessWidget {
 

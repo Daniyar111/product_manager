@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter_training/widgets/ui_elements/title_default.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:flutter_training/models/product.dart';
-import 'package:flutter_training/scoped_models/products.dart';
+import 'package:flutter_training/scoped_models/main.dart';
 
 class ProductPage extends StatelessWidget {
 
@@ -76,8 +76,8 @@ class ProductPage extends StatelessWidget {
         Navigator.pop(context, false);
         return Future.value(false);
       },
-      child: ScopedModelDescendant(builder: (BuildContext context, Widget child, ProductsModel model){
-        final Product product = model.products[productPosition];
+      child: ScopedModelDescendant<MainModel>(builder: (BuildContext context, Widget child, MainModel model){
+        final Product product = model.allProducts[productPosition];
         return Scaffold(
           appBar: AppBar(
             title: Text(product.title),

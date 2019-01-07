@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'products.dart';
+import 'package:scoped_model/scoped_model.dart';
+import 'package:flutter_training/scoped_models/main.dart';
 
 class AuthPage extends StatefulWidget {
 
@@ -76,7 +77,7 @@ class _AuthPageState extends State<AuthPage>{
     );
   }
 
-  _onLoginPressed(){
+  _onLoginPressed(Function login){
     if(!_formKey.currentState.validate()){
       return;
     }
@@ -86,6 +87,7 @@ class _AuthPageState extends State<AuthPage>{
       _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text("Please, Accept Terms")));
       return;
     }
+    login(_formData["email"], _formData["password"]);
     Navigator.pushReplacementNamed(context, "/main");
   }
 
@@ -105,30 +107,37 @@ class _AuthPageState extends State<AuthPage>{
           image: _buildBackgroundImage()
         ),
         padding: EdgeInsets.all(10),
-        child: Center(
-          child: SingleChildScrollView(
-            child: Container(
-              width: targetWidth,
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  children: <Widget>[
-                    _buildEmailTextField(),
-                    SizedBox(height: 10,),
-                    _buildPasswordTextField(),
-                    _buildSwitchAccept(),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    RaisedButton(
-                      child: Text("LOGIN"),
-                      textColor: Colors.white,
-                      onPressed: _onLoginPressed,
-                    )
-                  ],
-                ),
+        child: GestureDetector(
+          onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
+          child: Center(
+            child: SingleChildScrollView(
+              child: Container(
+                width: targetWidth,
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    children: <Widget>[
+                      _buildEmailTextField(),
+                      SizedBox(height: 10,),
+                      _buildPasswordTextField(),
+                      _buildSwitchAccept(),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      ScopedModelDescendant<MainModel>(
+                        builder: (BuildContext context, Widget child, MainModel model){
+                          return RaisedButton(
+                            child: Text("LOGIN"),
+                            textColor: Colors.white,
+                            onPressed: () => _onLoginPressed(model.login),
+                          );
+                        },
+                      )
+                    ],
+                  ),
+                )
               )
-            )
+            ),
           ),
         )
       ),

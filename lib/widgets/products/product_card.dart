@@ -4,7 +4,7 @@ import 'package:flutter_training/widgets/products/address_tag.dart';
 import 'package:flutter_training/widgets/ui_elements/title_default.dart';
 import 'package:flutter_training/models/product.dart';
 import 'package:scoped_model/scoped_model.dart';
-import 'package:flutter_training/scoped_models/products.dart';
+import 'package:flutter_training/scoped_models/main.dart';
 
 class ProductCard extends StatelessWidget {
 
@@ -36,10 +36,10 @@ class ProductCard extends StatelessWidget {
             color: Colors.blue,
             onPressed: () => Navigator.pushNamed<bool>(context, "/product/$productPosition")
         ),
-        ScopedModelDescendant<ProductsModel>(
-          builder: (BuildContext context, Widget child, ProductsModel model){
+        ScopedModelDescendant<MainModel>(
+          builder: (BuildContext context, Widget child, MainModel model){
             return IconButton(
-                icon: Icon(model.products[productPosition].isFavorite ? Icons.favorite : Icons.favorite_border),
+                icon: Icon(model.allProducts[productPosition].isFavorite ? Icons.favorite : Icons.favorite_border),
                 color: Colors.red,
                 onPressed: () {
                   model.selectProduct(productPosition);
@@ -59,6 +59,7 @@ class ProductCard extends StatelessWidget {
           Image.asset(product.image),
           _buildTitlePriceRow(),
           AddressTag("Union Square, San Francisco"),
+          Text(product.userEmail),
           _buildActionButton(context)
         ])
     );

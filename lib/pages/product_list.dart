@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_training/pages/product_edit.dart';
 import 'package:flutter_training/models/product.dart';
-import 'package:flutter_training/scoped_models/products.dart';
+import 'package:flutter_training/scoped_models/main.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 class ProductListPage extends StatelessWidget {
 
-  Widget _buildEditButton(BuildContext context, int position, ProductsModel model){
+  Widget _buildEditButton(BuildContext context, int position, MainModel model){
     return IconButton(
       icon: Icon(Icons.edit),
       onPressed: (){
@@ -20,12 +20,12 @@ class ProductListPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ScopedModelDescendant<ProductsModel>(
-      builder: (BuildContext context, Widget child, ProductsModel model){
+    return ScopedModelDescendant<MainModel>(
+      builder: (BuildContext context, Widget child, MainModel model){
         return ListView.builder(
           itemBuilder: (BuildContext context, int position){
             return Dismissible(
-              key: Key(model.products[position].title),
+              key: Key(model.allProducts[position].title),
               background: Container(color: Colors.red,),
 //          secondaryBackground: Container(color: Colors.green,),
               onDismissed: (DismissDirection direction){
@@ -44,10 +44,10 @@ class ProductListPage extends StatelessWidget {
                 children: <Widget>[
                   ListTile(
                       leading: CircleAvatar(
-                        backgroundImage: AssetImage(model.products[position].image),
+                        backgroundImage: AssetImage(model.allProducts[position].image),
                       ),
-                      title: Text(model.products[position].title),
-                      subtitle: Text("\$${model.products[position].price.toString()}"),
+                      title: Text(model.allProducts[position].title),
+                      subtitle: Text("\$${model.allProducts[position].price.toString()}"),
                       trailing: _buildEditButton(context, position, model)
                   ),
                   Divider()
@@ -55,7 +55,7 @@ class ProductListPage extends StatelessWidget {
               ),
             );
           },
-          itemCount: model.products.length,
+          itemCount: model.allProducts.length,
         );
       },
     );
