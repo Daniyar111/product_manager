@@ -14,6 +14,7 @@ class ProductCard extends StatelessWidget {
   ProductCard(this.product, this.productPosition);
 
   Widget _buildTitlePriceRow(){
+
     return Container(
         padding: EdgeInsets.only(top: 10),
         child: Row(
@@ -28,35 +29,44 @@ class ProductCard extends StatelessWidget {
   }
 
   Widget _buildActionButton(BuildContext context){
-    return ButtonBar(
-      alignment: MainAxisAlignment.center,
-      children: <Widget>[
-        IconButton(
-            icon: Icon(Icons.info),
-            color: Colors.blue,
-            onPressed: () => Navigator.pushNamed<bool>(context, "/product/$productPosition")
-        ),
-        ScopedModelDescendant<MainModel>(
-          builder: (BuildContext context, Widget child, MainModel model){
-            return IconButton(
+
+    return ScopedModelDescendant<MainModel>(
+      builder: (BuildContext context, Widget child, MainModel model){
+
+        return ButtonBar(
+          alignment: MainAxisAlignment.center,
+          children: <Widget>[
+
+            IconButton(
+                icon: Icon(Icons.info),
+                color: Colors.blue,
+                onPressed: () => Navigator.pushNamed<bool>(context, "/product/${model.allProducts[productPosition].id}")
+            ),
+            IconButton(
                 icon: Icon(model.allProducts[productPosition].isFavorite ? Icons.favorite : Icons.favorite_border),
                 color: Colors.red,
                 onPressed: () {
-                  model.selectProduct(productPosition);
+                  model.selectProduct(model.allProducts[productPosition].id);
                   model.toggleProductFavoriteStatus();
                 }
-            );
-          },
-        ),
-      ],
+            )
+          ],
+        );
+      },
     );
   }
 
   @override
   Widget build(BuildContext context) {
+
     return Card(
         child: Column(children: <Widget>[
-          Image.asset(product.image),
+          FadeInImage(
+            image: NetworkImage(product.image),
+            placeholder: AssetImage('assets/killer.jpg'),
+            height: 300,
+            fit: BoxFit.cover,
+          ),
           _buildTitlePriceRow(),
           AddressTag("Union Square, San Francisco"),
           Text(product.userEmail),
