@@ -8,12 +8,13 @@ import 'package:flutter_training/pages/product.dart';
 import 'package:scoped_model/scoped_model.dart';
 //import 'package:flutter_driver/driver_extension.dart';
 import 'package:flutter_training/scoped_models/main.dart';
+//import 'package:map_view/map_view.dart';
 
 main(){
 //  debugPaintSizeEnabled = true;
 //  debugPaintBaselinesEnabled = true;
 //  debugPaintPointersEnabled = true;
-
+//  MapView.setApiKey('AIzaSyCOtid3XsnFaN3hGD7sQytFACLjiNAE5bo');
   runApp(MainApplication());
 }
 

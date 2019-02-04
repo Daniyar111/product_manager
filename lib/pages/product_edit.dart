@@ -3,6 +3,7 @@ import 'package:flutter_training/models/product.dart';
 import 'package:flutter_training/widgets/form_inputs/location.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:flutter_training/scoped_models/main.dart';
+import 'package:flutter_training/models/location_data.dart';
 
 
 class ProductEditPage extends StatefulWidget {
@@ -19,17 +20,44 @@ class _ProductEditPageState extends State<ProductEditPage>{
     "title": null,
     "description": null,
     "price": null,
-    "image": "assets/killer.jpg"
+    "image": "assets/killer.jpg",
+    'location': null
   };
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final _titleTextController = TextEditingController();
 
   Widget _buildTitleTextField(Product product){
+
+    if (product == null && _titleTextController.text.trim() == '') {
+
+      // no product and no values entered by user
+      _titleTextController.text = '';
+    }
+    else if (product != null && _titleTextController.text.trim() == '') {
+
+      // there is a product and the user didn't entered something
+      _titleTextController.text = product.title;
+    }
+    else if (product != null && _titleTextController.text.trim() != '') {
+
+      // there is a product and the user entered something
+      _titleTextController.text = _titleTextController.text;
+    }
+    else if (product == null && _titleTextController.text.trim() != '') {
+
+      // no product and the user added something
+      _titleTextController.text = _titleTextController.text;
+    }
+    else {
+      _titleTextController.text = '';
+    }
 
     return TextFormField(
       decoration: InputDecoration(
           labelText: "Product Title"
       ),
-      initialValue: product == null ? "" : product.title,
+//      initialValue: product == null ? "" : product.title,
+      controller: _titleTextController,
       validator: (String value){
 
         if(value.isEmpty || value.length < 5){
@@ -126,6 +154,8 @@ class _ProductEditPageState extends State<ProductEditPage>{
               _buildDescriptionTextField(product),
               _buildPriceTextField(product),
               SizedBox(height: 10,),
+              LocationInput(product, _setLocation),
+              SizedBox(height: 10,),
               _buildSubmitButton()
 //                GestureDetector(
 //                  onTap: _onCreatePressed,
@@ -141,6 +171,12 @@ class _ProductEditPageState extends State<ProductEditPage>{
       ),
     );
   }
+
+
+  void _setLocation(LocationData locationData){
+    _formData["location"] = locationData;
+  }
+
 
   void _showWarningDialog(BuildContext context) {
 
@@ -175,10 +211,11 @@ class _ProductEditPageState extends State<ProductEditPage>{
 
     if(selectedProductPosition == -1){
       addProduct (
-        _formData["title"],
+        _titleTextController.text,
         _formData["description"],
         _formData["price"],
-        _formData["image"]
+        _formData["image"],
+        _formData['location']
       ).then((bool success){
         if(success){
           Navigator.pushReplacementNamed(context, "/").then((_) => setSelectedProduct(null));
@@ -190,10 +227,11 @@ class _ProductEditPageState extends State<ProductEditPage>{
     }
     else{
       updateProduct(
-        _formData["title"],
+        _titleTextController.text,
         _formData["description"],
         _formData["price"],
-        _formData["image"]
+        _formData["image"],
+        _formData['location']
       ).then((_){
         Navigator.pushReplacementNamed(context, "/").then((_) => setSelectedProduct(null));
       });

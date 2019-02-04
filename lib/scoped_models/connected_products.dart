@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter_training/models/auth.dart';
+import 'package:flutter_training/models/location_data.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:flutter_training/models/product.dart';
 import 'package:flutter_training/models/user.dart';
@@ -17,11 +18,12 @@ mixin ConnectedProductsModel on Model{
   String _selectedProductId;
   bool _isLoading = false;
 
-  final String API_KEY = 'AIzaSyC_elvWmIDvqrq2CdEdHgSnkwApndf8-SE';
+  final String apiKey = 'AIzaSyC_elvWmIDvqrq2CdEdHgSnkwApndf8-SE';
   final String imageUrl = "https://p2.trrsf.com/image/fget/cf/460/0/images.terra.com/2018/05/11/chocolate.jpg";
   final String baseUrl = "https://productmanager-edceb.firebaseio.com/";
 
   final String authUrl = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/";
+//  final String mapApiKey = 'AIzaSyCOtid3XsnFaN3hGD7sQytFACLjiNAE5bo';
 }
 
 mixin ProductsModel on ConnectedProductsModel{
@@ -85,7 +87,7 @@ mixin ProductsModel on ConnectedProductsModel{
 
 
 
-  Future<bool> addProduct(String title, String description, double price, String image) async {
+  Future<bool> addProduct(String title, String description, double price, String image, LocationData locationData) async {
 
     _isLoading = true;
     notifyListeners();
@@ -97,6 +99,9 @@ mixin ProductsModel on ConnectedProductsModel{
       "image": imageUrl,
       'userEmail': _authenticatedUser.email,
       'userId': _authenticatedUser.id,
+      'loc_lat': locationData.latitude,
+      'loc_lng': locationData.longitude,
+      'loc_address': locationData.address
     };
 
 
@@ -115,13 +120,14 @@ mixin ProductsModel on ConnectedProductsModel{
       print("responseData $responseData");
 
       final Product newProduct = Product(
-          id: responseData['name'],
-          title: title,
-          description: description,
-          price: price,
-          image: image,
-          userEmail: _authenticatedUser.email,
-          userId: _authenticatedUser.id
+        id: responseData['name'],
+        title: title,
+        description: description,
+        price: price,
+        image: image,
+        location: locationData,
+        userEmail: _authenticatedUser.email,
+        userId: _authenticatedUser.id,
       );
       _products.add(newProduct);
 
@@ -168,6 +174,10 @@ mixin ProductsModel on ConnectedProductsModel{
             description: productData["description"],
             image: productData["image"],
             price: productData["price"],
+            location: LocationData(
+              address: productData['loc_address'],
+              latitude: productData['loc_lat'],
+              longitude: productData['loc_lng']),
             userEmail: productData['userEmail'],
             userId: productData['userId'],
             isFavorite: productData['wishlistUsers'] == null ? false : (productData['wishlistUsers'] as Map<String, dynamic>).containsKey(_authenticatedUser.id)
@@ -196,7 +206,7 @@ mixin ProductsModel on ConnectedProductsModel{
 
 
 
-  Future<bool> updateProduct(String title, String description, double price, String image) async{
+  Future<bool> updateProduct(String title, String description, double price, String image, LocationData location) async{
 
     _isLoading = true;
     notifyListeners();
@@ -206,6 +216,9 @@ mixin ProductsModel on ConnectedProductsModel{
       "description": description,
       "price": price,
       "image": imageUrl,
+      'loc_lat': location.latitude,
+      'loc_lng': location.longitude,
+      'loc_address': location.address,
       "userEmail": selectedProduct.userEmail,
       "userId": selectedProduct.userId,
     };
@@ -221,6 +234,7 @@ mixin ProductsModel on ConnectedProductsModel{
           description: description,
           price: price,
           image: image,
+          location: location,
           userEmail: selectedProduct.userEmail,
           userId: selectedProduct.userId
       );
@@ -279,6 +293,7 @@ mixin ProductsModel on ConnectedProductsModel{
         description: selectedProduct.description,
         price: selectedProduct.price,
         image: selectedProduct.image,
+        location: selectedProduct.location,
         userEmail: selectedProduct.userEmail,
         userId: selectedProduct.userId,
         isFavorite: newFavoriteStatus
@@ -310,6 +325,7 @@ mixin ProductsModel on ConnectedProductsModel{
           description: selectedProduct.description,
           price: selectedProduct.price,
           image: selectedProduct.image,
+          location: selectedProduct.location,
           userEmail: selectedProduct.userEmail,
           userId: selectedProduct.userId,
           isFavorite: !newFavoriteStatus
@@ -327,7 +343,9 @@ mixin ProductsModel on ConnectedProductsModel{
 
   void selectProduct(String id){
     _selectedProductId = id;
-    notifyListeners();
+    if(id != null){
+      notifyListeners();
+    }
   }
 
 
@@ -367,7 +385,7 @@ mixin UserModel on ConnectedProductsModel{
     http.Response response;
     if(mode == AuthMode.Login){
       response = await http.post(
-        "${authUrl}verifyPassword?key=$API_KEY",
+        "${authUrl}verifyPassword?key=$apiKey",
         headers: {
           'Content-Type': 'application/json'
         },
@@ -376,7 +394,7 @@ mixin UserModel on ConnectedProductsModel{
     }
     else{
       response = await http.post(
-        "${authUrl}signupNewUser?key=$API_KEY",
+        "${authUrl}signupNewUser?key=$apiKey",
         headers: {
           'Content-Type': 'application/json'
         },
