@@ -32,8 +32,11 @@ class _ProductListPageState extends State<ProductListPage>{
       onPressed: (){
         model.selectProduct(model.allProducts[position].id);
         Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context){
+
           return ProductEditPage();
-        }));
+        })).then((_){
+          model.selectProduct(null);
+        });
       },
     );
   }
