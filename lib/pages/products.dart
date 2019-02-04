@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_training/widgets/products/products.dart';
 import 'package:flutter_training/scoped_models/main.dart';
+import 'package:flutter_training/widgets/ui_elements/logout_list_tile.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 class ProductsPage extends StatefulWidget {
@@ -23,7 +24,6 @@ class _ProductsPageState extends State<ProductsPage>{
   void initState(){
 
     widget.model.fetchProducts();
-
     super.initState();
   }
 
@@ -45,6 +45,9 @@ class _ProductsPageState extends State<ProductsPage>{
               Navigator.pushReplacementNamed(context, "/admin");
             },
           ),
+
+          Divider(),
+          LogoutListTile(),
         ],
       ),
     );

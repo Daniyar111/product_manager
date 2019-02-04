@@ -17,6 +17,9 @@ class _AuthPageState extends State<AuthPage>{
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
+  final TextEditingController _passwordTextController = TextEditingController();
+  AuthMode _authMode = AuthMode.Login;
+
   final Map<String, dynamic> _formData = {
     "email": null,
     "password": null
@@ -62,6 +65,7 @@ class _AuthPageState extends State<AuthPage>{
           filled: true,
           fillColor: Colors.white
       ),
+      controller: _passwordTextController,
       obscureText: true,
       validator: (String value){
 
@@ -73,6 +77,29 @@ class _AuthPageState extends State<AuthPage>{
       onSaved: (String value) => _formData["password"] = value,
     );
   }
+
+
+  Widget _buildPasswordConfirmTextField(){
+
+    return TextFormField(
+      textInputAction: TextInputAction.done,
+      decoration: InputDecoration(
+          labelText: "Confirm Password",
+          filled: true,
+          fillColor: Colors.white
+      ),
+      obscureText: true,
+      validator: (String value){
+
+        if(_passwordTextController.text != value){
+          return "Passwords do not match.";
+        }
+      },
+
+      onSaved: (String value) => _formData["password"] = value,
+    );
+  }
+
 
   Widget _buildSwitchAccept(){
 
@@ -87,7 +114,32 @@ class _AuthPageState extends State<AuthPage>{
     );
   }
 
-  void _onLoginPressed(Function login){
+
+  void _showWarningDialog(BuildContext context, Map<String, dynamic> info) {
+
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+
+          return AlertDialog(
+            title: Text("An Error Occured!"),
+            content: Text(info['message']),
+            actions: <Widget>[
+
+              FlatButton(
+                child: Text("Okay"),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        }
+    );
+  }
+
+
+  void _onLoginPressed(Function authenticate) async{
 
     if(!_formKey.currentState.validate()){
       return;
@@ -99,9 +151,19 @@ class _AuthPageState extends State<AuthPage>{
       return;
     }
 
-    login(_formData["email"], _formData["password"]);
-    Navigator.pushReplacementNamed(context, "/main");
+    Map<String, dynamic> successInformation;
+
+
+      successInformation = await authenticate(_formData["email"], _formData["password"], _authMode);
+
+      if(successInformation['success']){
+//        Navigator.pushReplacementNamed(context, "/");
+      }
+      else{
+        _showWarningDialog(context, successInformation);
+      }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -133,17 +195,37 @@ class _AuthPageState extends State<AuthPage>{
                         _buildEmailTextField(),
                         SizedBox(height: 10,),
                         _buildPasswordTextField(),
+                        SizedBox(height: 10),
+
+                        _authMode == AuthMode.Signup
+                            ? _buildPasswordConfirmTextField()
+                            : Container(),
+
                         _buildSwitchAccept(),
+                        SizedBox(height: 10),
+
+                        FlatButton(
+                          child: Text('Switch to ${_authMode == AuthMode.Login ? 'Signup' : 'Login'}'),
+                          onPressed: (){
+                            setState(() {
+                              _authMode = _authMode == AuthMode.Login
+                                  ? AuthMode.Signup
+                                  : AuthMode.Login;
+                            });
+                          },
+                        ),
                         SizedBox(height: 10),
 
                         ScopedModelDescendant<MainModel>(
                           builder: (BuildContext context, Widget child, MainModel model){
 
-                            return RaisedButton(
-                              child: Text("LOGIN"),
-                              textColor: Colors.white,
-                              onPressed: () => _onLoginPressed(model.login),
-                            );
+                            return model.isLoading
+                                ? CircularProgressIndicator()
+                                : RaisedButton(
+                                  child: Text(_authMode == AuthMode.Login ? 'LOGIN' : 'SIGNUP'),
+                                  textColor: Colors.white,
+                                  onPressed: () => _onLoginPressed(model.authenticate),
+                                );
                           },
                         )
                       ],
