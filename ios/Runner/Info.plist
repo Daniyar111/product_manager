@@ -28,6 +28,9 @@
 	<string>Main</string>
 	<key>io.flutter.embedded_views_preview</key>
     <string>YES</string>
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>User location is required to add a product location.</string>
+    <string>Main</string>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
