@@ -4,6 +4,7 @@ import 'package:flutter_training/widgets/form_inputs/location.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:flutter_training/scoped_models/main.dart';
 import 'package:flutter_training/models/location_data.dart';
+import 'package:flutter_training/widgets/form_inputs/image.dart';
 
 
 class ProductEditPage extends StatefulWidget {
@@ -155,6 +156,8 @@ class _ProductEditPageState extends State<ProductEditPage>{
               _buildPriceTextField(product),
               SizedBox(height: 10,),
               LocationInput(product, _setLocation),
+              SizedBox(height: 10,),
+              ImageInput(),
               SizedBox(height: 10,),
               _buildSubmitButton()
 //                GestureDetector(

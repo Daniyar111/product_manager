@@ -25,6 +25,7 @@ dependencies:
   rxdart: ^0.20.0
   google_maps_flutter: ^0.2.0
   location: ^1.4.1
+#  image_picker: ^0.5.0+1
 #  map_view: ^0.0.14
 
 dev_dependencies:
