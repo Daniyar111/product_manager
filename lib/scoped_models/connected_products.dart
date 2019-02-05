@@ -144,9 +144,6 @@ mixin ProductsModel on ConnectedProductsModel{
 
 
 
-
-
-
 // get
   Future<Null> fetchProducts({onlyForUser = false}) {
 
