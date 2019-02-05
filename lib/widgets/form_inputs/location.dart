@@ -40,7 +40,7 @@ class _LocationInputState extends State<LocationInput> {
     _addressInputController.addListener(_updateLocation);
 
     if(widget.product != null){
-      _getMap(widget.product.location.address);
+      _getMap(widget.product.location.address, geocode: false);
     }
 
     super.initState();
@@ -56,35 +56,35 @@ class _LocationInputState extends State<LocationInput> {
 
 
 
-//  Future<String> _getAddress(double lat, double lng) async {
-//
-//    final Uri mapUri = Uri.https(
-//      mapUrl,
-//        mapPath,
-//      {
-//        'latlng': '${lat.toString()},${lng.toString()}', 'key': mapKey
-//      }
-//    );
-//
-//    http.Response response = await http.get(mapUri);
-//    final decodedResponse = json.decode(response.body);
-//    print("decodedResponse $decodedResponse");
-//
-//    final formattedAddress = decodedResponse['result'][0]['formattedAddress'];
-//    return formattedAddress;
-//  }
+  Future<String> _getAddress(double lat, double lng) async {
+
+    final Uri mapUri = Uri.https(
+      mapUrl,
+        mapPath,
+      {
+        'latlng': '${lat.toString()},${lng.toString()}', 'key': mapKey
+      }
+    );
+
+    http.Response response = await http.get(mapUri);
+    final decodedResponse = json.decode(response.body);
+    print("decodedResponse $decodedResponse");
+
+    final formattedAddress = decodedResponse['result'][0]['formattedAddress'];
+    return formattedAddress;
+  }
 
 
 
-//  void _getUserLocation() async {
-//
-//    final location = geolocation.Location();
-//    final currentLocation = await location.getLocation();
-//    print("currentLocation $currentLocation");
-//
-//    final address = await _getAddress(currentLocation['latitude'], currentLocation['longitude']);
-//    _getMap(address, lat: currentLocation['latitude'], lng: currentLocation['longitude']);
-//  }
+  void _getUserLocation() async {
+
+    final location = geolocation.Location();
+    final currentLocation = await location.getLocation();
+    print("currentLocation $currentLocation");
+
+    final address = await _getAddress(currentLocation['latitude'], currentLocation['longitude']);
+    _getMap(address, geocode: false, lat: currentLocation['latitude'], lng: currentLocation['longitude']);
+  }
 
 
 
@@ -96,7 +96,7 @@ class _LocationInputState extends State<LocationInput> {
 
 
 
-  void _getMap(String address, {double lat, double lng}) async {
+  void _getMap(String address, {bool geocode = true, double lat, double lng}) async {
 
     if(address.isEmpty){
       setState(() {
@@ -106,7 +106,8 @@ class _LocationInputState extends State<LocationInput> {
       return;
     }
 
-    if(lat == null && lng == null){
+//    if(lat == null && lng == null){
+    if(geocode){
 
       final Uri mapUri = Uri.https(
         mapUrl,
@@ -131,8 +132,13 @@ class _LocationInputState extends State<LocationInput> {
       );
     }
 
+    else if (lat == null && lng == null){
+//      _locationData = LocationData(address: address, latitude: lat, longitude: lng);
+      _locationData = widget.product.location;
+    }
     else{
-      _locationData = LocationData(address: address, latitude: lat, longitude: lng);
+       _locationData = LocationData(address: address, latitude: lat, longitude: lng);
+
     }
 
     widget.setLocation(_locationData);
@@ -181,7 +187,7 @@ class _LocationInputState extends State<LocationInput> {
     return Column(
       children: <Widget>[
         TextFormField(
-          focusNode: _addressInputFocusNode,
+//          focusNode: _addressInputFocusNode,
           controller: _addressInputController,
           decoration: InputDecoration(
             labelText: 'Address'
@@ -192,10 +198,10 @@ class _LocationInputState extends State<LocationInput> {
             }
           },
         ),
-//        FlatButton(
-//          child: Text('Locate user'),
-//          onPressed: _getUserLocation,
-//        ),
+        FlatButton(
+          child: Text('Locate user'),
+          onPressed: _getUserLocation,
+        ),
         SizedBox(height: 10,),
         widget.product != null || _addressInputController.text.isNotEmpty
           ? SizedBox(

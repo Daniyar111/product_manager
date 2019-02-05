@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_training/widgets/products/price_tag.dart';
 import 'dart:async';
 import 'package:flutter_training/widgets/ui_elements/title_default.dart';
-import 'package:scoped_model/scoped_model.dart';
 import 'package:flutter_training/models/product.dart';
-import 'package:flutter_training/scoped_models/main.dart';
 
 class ProductPage extends StatelessWidget {
 
@@ -12,15 +9,22 @@ class ProductPage extends StatelessWidget {
 
   ProductPage(this.product);
 
-  Widget _buildAddressPriceRow(Product product) {
+  void _showMap(){
+
+  }
+
+  Widget _buildAddressPriceRow(String address, double price) {
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
 
-        Text(
-          "Union Square, San Francisco",
-          style: TextStyle(fontFamily: "FFF_Tusj", color: Colors.grey),
+        GestureDetector(
+          onTap: _showMap,
+          child: Text(
+            address,
+            style: TextStyle(fontFamily: "FFF_Tusj", color: Colors.grey),
+          ),
         ),
 
         Container(
@@ -32,7 +36,7 @@ class ProductPage extends StatelessWidget {
         ),
 
         Text(
-          product.price.toString(),
+          '\$' + price.toString(),
           style: TextStyle(fontFamily: "FFF_Tusj", color: Colors.grey),
         ),
       ],
@@ -66,7 +70,7 @@ class ProductPage extends StatelessWidget {
               padding: EdgeInsets.all(10),
               child: TitleDefault(product.title),
             ),
-            _buildAddressPriceRow(product),
+            _buildAddressPriceRow(product.location.address, product.price),
             Container(
               padding: EdgeInsets.all(10),
               child: Text(
