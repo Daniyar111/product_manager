@@ -23,6 +23,7 @@ class _AuthPageState extends State<AuthPage> with TickerProviderStateMixin{
   Animation<Offset> _slideAnimation;
 
 
+
   final Map<String, dynamic> _formData = {
     "email": null,
     "password": null
