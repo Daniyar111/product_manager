@@ -13,12 +13,15 @@ class AuthPage extends StatefulWidget {
   }
 }
 
-class _AuthPageState extends State<AuthPage>{
+class _AuthPageState extends State<AuthPage> with TickerProviderStateMixin{
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
   final TextEditingController _passwordTextController = TextEditingController();
   AuthMode _authMode = AuthMode.Login;
+  AnimationController _controller;
+  Animation<Offset> _slideAnimation;
+
 
   final Map<String, dynamic> _formData = {
     "email": null,
@@ -27,6 +30,25 @@ class _AuthPageState extends State<AuthPage>{
 
   bool _acceptTerms = false;
   RegExp _emailRegExp = RegExp(r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?");
+
+
+  @override
+  void initState() {
+    _controller = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 300)
+    );
+    _slideAnimation = Tween<Offset>(
+      begin: Offset(0, -1.5),
+      end: Offset.zero
+    ).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.fastOutSlowIn
+    ));
+    super.initState();
+  }
+
 
   DecorationImage _buildBackgroundImage(){
 
@@ -81,22 +103,28 @@ class _AuthPageState extends State<AuthPage>{
 
   Widget _buildPasswordConfirmTextField(){
 
-    return TextFormField(
-      textInputAction: TextInputAction.done,
-      decoration: InputDecoration(
-          labelText: "Confirm Password",
-          filled: true,
-          fillColor: Colors.white
+    return FadeTransition(
+      opacity: CurvedAnimation(parent: _controller, curve: Curves.easeIn),
+      child: SlideTransition(
+        position: _slideAnimation,
+        child: TextFormField(
+          textInputAction: TextInputAction.done,
+          decoration: InputDecoration(
+              labelText: "Confirm Password",
+              filled: true,
+              fillColor: Colors.white
+          ),
+          obscureText: true,
+          validator: (String value){
+
+            if(_passwordTextController.text != value && _authMode == AuthMode.Signup){
+              return "Passwords do not match.";
+            }
+          },
+
+          onSaved: (String value) => _formData["password"] = value,
+        ),
       ),
-      obscureText: true,
-      validator: (String value){
-
-        if(_passwordTextController.text != value){
-          return "Passwords do not match.";
-        }
-      },
-
-      onSaved: (String value) => _formData["password"] = value,
     );
   }
 
@@ -196,10 +224,7 @@ class _AuthPageState extends State<AuthPage>{
                         SizedBox(height: 10,),
                         _buildPasswordTextField(),
                         SizedBox(height: 10),
-
-                        _authMode == AuthMode.Signup
-                            ? _buildPasswordConfirmTextField()
-                            : Container(),
+                        _buildPasswordConfirmTextField(),
 
                         _buildSwitchAccept(),
                         SizedBox(height: 10),
@@ -207,11 +232,19 @@ class _AuthPageState extends State<AuthPage>{
                         FlatButton(
                           child: Text('Switch to ${_authMode == AuthMode.Login ? 'Signup' : 'Login'}'),
                           onPressed: (){
-                            setState(() {
-                              _authMode = _authMode == AuthMode.Login
-                                  ? AuthMode.Signup
-                                  : AuthMode.Login;
-                            });
+                            if(_authMode == AuthMode.Login){
+                              setState(() {
+                                _authMode = AuthMode.Signup;
+                              });
+                              _controller.forward();
+                            }
+                            else{
+                              setState(() {
+                                _authMode = AuthMode.Login;
+                              });
+                              _controller.reverse();
+                            }
+
                           },
                         ),
                         SizedBox(height: 10),
