@@ -9,6 +9,8 @@ import 'package:scoped_model/scoped_model.dart';
 //import 'package:flutter_driver/driver_extension.dart';
 import 'package:flutter_training/scoped_models/main.dart';
 //import 'package:map_view/map_view.dart';
+import 'shared/adaptive_theme.dart';
+import 'helpers/custom_route.dart';
 
 main(){
 //  debugPaintSizeEnabled = true;
@@ -53,12 +55,7 @@ class _MainApplicationState extends State<MainApplication>{
       child: MaterialApp(
 //      debugShowMaterialGrid: true,
         debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-            brightness: Brightness.light,
-            primarySwatch: Colors.deepOrange,
-            accentColor: Colors.deepPurple,
-            buttonColor: Colors.red
-        ),
+        theme: getAdaptiveThemeData(context),
 //      home: AuthPage(),
         routes: {
 
@@ -70,7 +67,7 @@ class _MainApplicationState extends State<MainApplication>{
         onGenerateRoute: (RouteSettings settings){
 
           if(!_isAuthenticated){
-            return MaterialPageRoute<bool>(
+            return CustomRoute<bool>(
                 builder: (BuildContext context) => AuthPage()
             );
           }
@@ -87,14 +84,14 @@ class _MainApplicationState extends State<MainApplication>{
               return product.id == productId;
             });
 
-            return MaterialPageRoute<bool>(
+            return CustomRoute<bool>(
                 builder: (BuildContext context) => !_isAuthenticated ? AuthPage() : ProductPage(product)
             );
           }
           return null;
         },
         onUnknownRoute: (RouteSettings settings){
-          return MaterialPageRoute(
+          return CustomRoute(
               builder: (BuildContext context) => !_isAuthenticated ? AuthPage() : ProductsPage(_model)
           );
         },
